@@ -66,6 +66,52 @@ function shn_pref_session() {
 
 	global $global;
 
+	if (isset($_GET['shortname'])) {
+		$count = 0;
+		$shortname = $_GET['shortname'];
+		$original_incident_id = $incident_id = $global['db']->GetOne("SELECT incident_id FROM incident WHERE shortname = '{$shortname}'");
+		while ($global['db']->GetOne("SELECT parent_id FROM incident WHERE incident_id = '{$incident_id}'") != NULL) {
+			$incident_id = $global['db']->GetOne("SELECT parent_id FROM incident WHERE incident_id = '{$incident_id}'");
+			if (++$count == 1) {
+				$SessionIncident = $global['db']->GetOne("SELECT name FROM incident WHERE incident_id = '{$incident_id}'");
+			}
+
+		}
+		if ($count == 2) {
+				$SessionEvent = $global['db']->GetOne("SELECT name FROM incident WHERE incident_id = '{$original_incident_id}'");
+		}
+		$SessionDisaster = $global['db']->GetOne("SELECT name FROM incident WHERE incident_id = '{$incident_id}'");
+	}else{
+		$SessionDisaster = 'None';
+	}
+
+	$SessionInfoTableRows = array(
+		'Username' => $_SESSION['user'],
+		'Full Name' => $_SESSION['full_name'],
+		'User Group' => $_SESSION['full_name'],
+		'Locale' => $_SESSION['group_name'],
+		'Current Disaster' => $SessionDisaster,
+		'Current Incident' => $SessionIncident,
+		'Current Event' => $SessionEvent,
+	);
+	$mainRowOdd = false;
+	foreach ($SessionInfoTableRows as $key => $value) {
+		if (isset($value)) {
+			if ($mainRowOdd) {
+				$tableClass = 'mainRowOdd';
+			}else{
+				$tableClass = 'mainRowEven';
+			}
+			$SessionTableContents .= '
+				<tr>
+					<td style="padding-left: 8px; text-align: right;" class="'.$tableClass.'">'.$key.'</td>
+					<td style="padding-left: 8px; text-align: left; font-weight: bold;" class="'.$tableClass.'">'.$value.'</td>
+				</tr>
+			';
+			$mainRowOdd = !$mainRowOdd;
+		}
+	}
+	
 	echo "<br><div id=\"home\">";
 	echo '
 		<div id="rezMain" class="mainArea" style="opacity: 1; width: 300px;">
@@ -74,22 +120,7 @@ function shn_pref_session() {
 				<tr>
 					<td style="padding-left: 8px; text-align: left; font-weight: bold;" colspan=2 class="mainRowOdd">Currently Logged in as...</td>
 				</tr>
-				<tr>
-					<td style="padding-left: 8px; text-align: right;" class="mainRowEven">Username</td>
-					<td style="padding-left: 8px; text-align: left; font-weight: bold;" class="mainRowEven">'.$_SESSION['user'].'</td>
-				</tr>
-				<tr>
-					<td style="padding-left: 8px; text-align: right;" class="mainRowOdd">Full Name</td>
-					<td style="padding-left: 8px; text-align: left; font-weight: bold;" class="mainRowOdd">'.$_SESSION['full_name'].'</td>
-				</tr>
-				<tr>
-					<td style="padding-left: 8px; text-align: right;" class="mainRowEven">User Group</td>
-					<td style="padding-left: 8px; text-align: left; font-weight: bold;" class="mainRowEven">'.$_SESSION['group_name'].'</td>
-				</tr>
-				<tr>
-					<td style="padding-left: 8px; text-align: right;" class="mainRowOdd">Locale</td>
-					<td style="padding-left: 8px; text-align: left; font-weight: bold;" class="mainRowOdd">'.$_SESSION['locale'].'</td>
-				</tr>
+				'.$SessionTableContents.'
 				</tbody>
 			</table>
 		</div>
