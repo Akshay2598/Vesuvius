@@ -10,6 +10,7 @@
  * @lastModified 2011.0810
  */
 
+header("Content-Type: application/x-javascript; charset=UTF-8");
 
 function shn_text_xst_help() {
 	if(empty($_GET['help_id'])) {
