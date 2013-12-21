@@ -6,10 +6,10 @@
 * @version            1.0
 *
 * Usage:
-* Instantiate:        $googl = new googlURL('http://google.com/');
+* Instantiate:        $googl = new googlUrl('http://google.com/');
 * Recieve Short Link: $short = $googl->short();
 * 
-* Instantiate:        $googl = new googlURL('http://goo.gl/DE1y3W');
+* Instantiate:        $googl = new googlUrl('http://goo.gl/DE1y3W');
 * Recieve Long Link:  $long = $googl->long();
 */
 class googlUrl
